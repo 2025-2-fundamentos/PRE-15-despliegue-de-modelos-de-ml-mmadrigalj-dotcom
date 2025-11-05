@@ -1,23 +1,31 @@
-"""Minimal API client stub for homework tests.
+## api_client.py
 
-This file provides a tiny, import-safe placeholder so automated tests
-that only check for the file's existence will pass. You can replace
-these stubs with a real implementation later.
-"""
+#
+# Usage from command line:
+# curl http://127.0.0.1:5000 -X POST -H "Content-Type: application/json" -d '{"bathrooms": "2", "bedrooms": "3", "sqft_living": "1800", "sqft_lot": "2200", "floors": "1", "waterfront": "1", "condition": "3"}'
+#
+import requests
 
-from typing import Any, Dict
 
+def make_request():
+    """Make a request to the API server"""
 
-def predict(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """Return a fake prediction for the given payload.
+    url = "http://127.0.0.1:5000"
 
-    This is a placeholder implementation. It returns a dictionary with
-    a fixed prediction value so importing and calling the function is safe.
-    """
-    return {"prediction": None, "input": payload}
+    data = {
+        "bathrooms": "2",
+        "bedrooms": "3",
+        "sqft_living": "1800",
+        "sqft_lot": "2200",
+        "floors": "1",
+        "waterfront": "1",
+        "condition": "3",
+    }
+
+    response = requests.post(url, json=data, timeout=5)
+
+    print(response.text)
 
 
 if __name__ == "__main__":
-    # Simple smoke test when run directly
-    sample = {"rooms": 3, "bathrooms": 1}
-    print(predict(sample))
+    make_request()

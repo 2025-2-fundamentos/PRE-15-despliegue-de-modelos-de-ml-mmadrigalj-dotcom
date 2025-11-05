@@ -1,29 +1,54 @@
-"""Minimal API server stub for homework tests.
-
-This module provides a lightweight, import-safe placeholder for an API
-server. It doesn't start a network service; it only defines helper
-functions so tests that verify the file exists and can be imported pass.
-"""
-
-from typing import Dict, Any
+## api_server.py
 
 
-def load_model(path: str) -> Any:
-    """Placeholder for loading a model from disk.
+"""API server example"""
 
-    Returns None as a safe default. Replace with real loading logic if
-    needed.
-    """
-    return None
+#
+# Usage from command line:
+# curl http://127.0.0.1:5000 -X POST -H "Content-Type: application/json" \
+# -d '{"bathrooms": "2", "bedrooms": "3", "sqft_living": "1800", \
+# "sqft_lot": "2200", "floors": "1", "waterfront": "1", "condition": "3"}'
+#
+
+# Windows:
+# curl http://127.0.0.1:5000 -X POST -H "Content-Type: application/json" -d "{\"bathrooms\": \"2\", \"bedrooms\": \"3\", \"sqft_living\": \"1800\", \"sqft_lot\": \"2200\", \"floors\": \"1\", \"waterfront\": \"1\", \"condition\": \"3\"}"
+
+import pickle
+
+import pandas as pd  # type: ignore
+from flask import Flask, request  # type: ignore
+
+app = Flask(__name__)
+app.config["SECRET_KEY"] = "you-will-never-guess"
 
 
-def predict_from_model(model: Any, features: Dict[str, Any]) -> Dict[str, Any]:
-    """Return a fake prediction dict using provided features.
+FEATURES = [
+    "bedrooms",
+    "bathrooms",
+    "sqft_living",
+    "sqft_lot",
+    "floors",
+    "waterfront",
+    "condition",
+]
 
-    This is only a stub for tests and local development.
-    """
-    return {"prediction": None, "features": features}
+
+@app.route("/", methods=["POST"])
+def index():
+    """API function"""
+
+    args = request.json
+    filt_args = {key: [int(args[key])] for key in FEATURES}
+    df = pd.DataFrame.from_dict(filt_args)
+
+    with open("homework/house_predictor.pkl", "rb") as file:
+        loaded_model = pickle.load(file)
+
+    prediction = loaded_model.predict(df)
+
+    return str(prediction[0][0])
 
 
 if __name__ == "__main__":
-    print("api_server module loaded; no server started (stub).")
+    app.run(debug=True)
+    
